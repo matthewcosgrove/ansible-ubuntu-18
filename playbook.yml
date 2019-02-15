@@ -1,0 +1,79 @@
+---
+
+- name: Ubuntu desktop environment playbook
+  hosts: localhost
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+  tasks:
+    - name: add apt repo for remmina
+      become: true
+      apt_repository:
+        repo: ppa:remmina-ppa-team/remmina-next
+
+    - name: Install a list of packages
+      become: true
+      apt:
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - jq
+          - iptables
+          - sshuttle
+          - remmina
+          - remmina-plugin-rdp
+          - remmina-plugin-secret
+          - wireshark
+          - cntlm
+          - tree
+          - direnv
+          - bison
+          - curl
+          - grep
+          - gzip
+          - less
+          - nmap
+          - openssl
+          - sshpass
+          - tar
+          - unzip
+          - vim
+          - wget
+          - whois
+          - zip
+          # git credential helper
+          - libsecret-1-0
+          - libsecret-1-dev
+          # END git credential helper
+    - name: Install Zoom.
+      become: true
+      apt:
+        deb: https://zoom.us/client/latest/zoom_amd64.deb
+    - name: Set up libsecret for git credential helper
+      command: make --directory=/usr/share/doc/git/contrib/credential/libsecret
+      become: true
+    - name: Set up git credential helper
+      git_config:
+        name: credential.helper
+        scope: global
+        value: /usr/share/doc/git/contrib/credential/libsecret/git-credential-libsecret    
+    - name: Set up git to suppress message on push
+      git_config:
+        name: push.default
+        scope: global
+        value: simple
+    - name: update git config globally setting user.email
+      git_config:
+        name: user.email
+        scope: global
+        value: mc.matthew.cosgrove@gmail.com
+    - name: update git config globally setting user.name
+      git_config:
+        name: user.name
+        scope: global
+        value: matthewcosgrove
+    - name: update git config globally setting default editor
+      git_config:
+        name: core.editor
+        scope: global
+        value: vim
