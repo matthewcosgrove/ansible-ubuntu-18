@@ -45,10 +45,13 @@
           - libsecret-1-0
           - libsecret-1-dev
           # END git credential helper
+    - name: gather installed packages to check for Zoom
+      package_facts:
     - name: Install Zoom.
       become: true
       apt:
         deb: https://zoom.us/client/latest/zoom_amd64.deb
+      when: ansible_facts.packages.zoom is not defined
     - name: Set up libsecret for git credential helper
       command: make --directory=/usr/share/doc/git/contrib/credential/libsecret
       become: true
