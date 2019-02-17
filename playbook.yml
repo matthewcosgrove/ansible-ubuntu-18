@@ -47,11 +47,18 @@
           # END git credential helper
     - name: gather installed packages to check for Zoom
       package_facts:
+    - name: show them
+      debug: var=ansible_facts.packages
     - name: Install Zoom.
       become: true
       apt:
         deb: https://zoom.us/client/latest/zoom_amd64.deb
       when: ansible_facts.packages.zoom is not defined
+    - name: Install Chrome.
+      become: true
+      apt:
+        deb: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+      when: '"google-chrome-stable" not in ansible_facts.packages'
     - name: Set up libsecret for git credential helper
       command: make --directory=/usr/share/doc/git/contrib/credential/libsecret
       become: true
