@@ -4,6 +4,8 @@
   hosts: localhost
   environment:
     DEBIAN_FRONTEND: noninteractive
+  roles:
+    - { role: geerlingguy.docker, become: yes }
 
   tasks:
     - name: add apt repo for remmina
