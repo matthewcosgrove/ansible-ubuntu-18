@@ -45,6 +45,7 @@
           - libsecret-1-0
           - libsecret-1-dev
           # END git credential helper
+          - openconnect
     - name: gather installed packages to check for Zoom
       package_facts:
     - name: Install Zoom.
