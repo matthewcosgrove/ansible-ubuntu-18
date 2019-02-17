@@ -85,3 +85,15 @@
         name: core.editor
         scope: global
         value: vim
+    - name: Ensure ssh key generated ready to upload to GitHub and GitLab
+      command: ssh-keygen -t rsa -f "{{ ssh.key_pair_path }}" -N ''
+      args:
+        creates: "{{ ssh.key_pair_path }}"
+    - name: Ensure creds-for-curl-gitlab.txt is populated with GitLab access token which needs to be with scope api
+      wait_for:
+        path: creds-for-curl-gitlab.txt
+        search_regex: .*PRIVATE-TOKEN:\s\w+
+    - name: Upload SSH key to GitLab
+      shell: KEY=$( cat {{ ssh.key_pair_path }}.pub );TITLE=${KEY/* };curl -X POST -K creds-for-curl-gitlab.txt -F "title=$TITLE" -F "key=$KEY" "https://gitlab.com/api/v4/user/keys"
+      args:
+        executable: /bin/bash

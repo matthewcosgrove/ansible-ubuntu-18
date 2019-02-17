@@ -3,3 +3,9 @@
 # http://docs.ansible.com/ansible/playbooks_variables.html#variable-precedence-where-should-i-put-a-variable
 aptcachetime: 3600
 timezone: "Europe/London"
+ssh:
+  start: true
+  service_enabled: true
+  password_auth: false
+  root_login: false
+  key_pair_path: ~/.ssh/id_rsa
