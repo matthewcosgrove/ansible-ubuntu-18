@@ -48,6 +48,7 @@
           - libsecret-1-dev
           # END git credential helper
           - openconnect
+          - nautilus-dropbox
     - name: gather installed packages to check for Zoom
       package_facts:
     - name: Install Zoom.
@@ -92,11 +93,17 @@
       command: ssh-keygen -t rsa -f "{{ ssh.key_pair_path }}" -N ''
       args:
         creates: "{{ ssh.key_pair_path }}"
+    - name: check for creds-for-curl-gitlab.txt
+      stat:
+        path: 'creds-for-curl-gitlab.txt'
+      register: credsforcurlgitlab
     - name: Ensure creds-for-curl-gitlab.txt is populated with GitLab access token which needs to be with scope api
       wait_for:
         path: creds-for-curl-gitlab.txt
         search_regex: .*PRIVATE-TOKEN:\s\w+
+      when: credsforcurlgitlab.stat.exists
     - name: Upload SSH key to GitLab
       shell: KEY=$( cat {{ ssh.key_pair_path }}.pub );TITLE=${KEY/* };curl -X POST -K creds-for-curl-gitlab.txt -F "title=$TITLE" -F "key=$KEY" "https://gitlab.com/api/v4/user/keys"
       args:
         executable: /bin/bash
+      when: credsforcurlgitlab.stat.exists
