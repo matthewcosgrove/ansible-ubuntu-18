@@ -12,3 +12,5 @@ ansible-playbook playbook.yml --ask-become-pass
 # - name: show them
 #   debug: var=ansible_facts.packages
 ```
+
+Note to self. Keeping Firefox proxy switcher profiles json in the vpn repo. Remmina config is in ~/.local/share/remmina which contains user specific info, therefore using dropbox for migrating this manually
