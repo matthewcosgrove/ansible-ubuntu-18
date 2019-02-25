@@ -49,6 +49,7 @@
           # END git credential helper
           - openconnect
           - nautilus-dropbox
+          - net-tools
     - name: gather installed packages to check for Zoom
       package_facts:
     - name: Install Zoom.
