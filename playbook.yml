@@ -20,6 +20,7 @@
       vars:
         packages:
           - jq
+          - jo
           - iptables
           - sshuttle
           - remmina
@@ -108,3 +109,44 @@
       args:
         executable: /bin/bash
       when: credsforcurlgitlab.stat.exists
+    - name: check for creds-for-curl-github.netrc
+      stat:
+        path: 'creds-for-curl-github.netrc'
+      register: credsforcurlgithub
+    - name: Wait until creds-for-curl-github.netrc is created from creds-for-curl-github.netrc.template and updated with GitHub access key with scope write:public_key
+      wait_for:
+        path: creds-for-curl-github.netrc
+        search_regex: .*password\s\w+
+      when: credsforcurlgithub.stat.exists
+    - name: Upload SSH key to GitHub
+      shell: KEY=$( cat {{ ssh.key_pair_path }}.pub );TITLE=${KEY/* };JSON=$( jo title="$TITLE" key="$KEY" );curl --netrc-file creds-for-curl-github.netrc -d "$JSON" https://api.github.com/user/keys
+      args:
+        executable: /bin/bash
+      when: credsforcurlgithub.stat.exists
+    - name: mkdir for gists
+      file:
+        path: ~/gists
+        state: directory
+    - name: Clone dotfiles gist
+      git:
+        repo: git@gist.github.com:f012f714f8a401f965c86f5bc648a300.git
+        dest: ~/gists/dotfiles
+        accept_hostkey: yes
+        update: no
+      become: no
+    - name: symbolic links
+      file:
+        src: "~/gists/dotfiles/{{ item.dotfilename }}"
+        path: "~/{{ item.dotfilename }}"
+        state: link
+      with_items:
+        - { dotfilename: '.bash_aliases'}
+        - { dotfilename: '.bashrc_extension'}
+        - { dotfilename: '.env'}
+        - { dotfilename: '.functions'}
+    - name: extend bashrc
+      lineinfile:
+        path: ~/.bashrc
+        regexp: '^source ~/.bashrc_extension'
+        insertafter: EOF
+        line: 'source ~/.bashrc_extension'
