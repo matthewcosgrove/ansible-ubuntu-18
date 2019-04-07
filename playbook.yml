@@ -144,6 +144,7 @@
         - { dotfilename: '.bashrc_extension'}
         - { dotfilename: '.env'}
         - { dotfilename: '.functions'}
+        - { dotfilename: '.vimrc'}
     - name: extend bashrc
       lineinfile:
         path: ~/.bashrc
