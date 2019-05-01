@@ -51,8 +51,14 @@
           - openconnect
           - nautilus-dropbox
           - net-tools
-    - name: gather installed packages to check for Zoom
+          - kazam
+    - name: gather installed packages to check for Slack, Zoom, Chrome etc
       package_facts:
+    - name: Install Slack.
+      become: true
+      apt:
+        deb: https://downloads.slack-edge.com/linux_releases/slack-desktop-3.3.8-amd64.deb
+      when: '"slack-desktop" not in ansible_facts.packages'
     - name: Install Zoom.
       become: true
       apt:
