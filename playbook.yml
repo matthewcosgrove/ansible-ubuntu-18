@@ -64,6 +64,7 @@
           - virtualbox
           - google-cloud-sdk
           - tmux
+          - golang-cfssl
     - name: gather installed packages to check for Slack, Zoom, Chrome etc
       package_facts:
     - name: Install Slack.
