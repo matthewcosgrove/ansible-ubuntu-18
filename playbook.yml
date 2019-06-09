@@ -12,11 +12,22 @@
       become: true
       apt_repository:
         repo: ppa:remmina-ppa-team/remmina-next
-    - name: Add the Google Cloud SDK distribution URI as a package source
-      shell: echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+    - name: Add apt repos e.g. Google Cloud SDK
+      apt_repository:
+        repo: deb {{ item.value.url }}
+        state: present
+        filename: "{{ item.value.filename }}"
       become: true
+      with_dict: "{{ apt_repository_repos }}"
+      vars:
+        apt_repository_repos:
+          google-cloud-sdk:
+            url: '[signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main'
+            filename: google-cloud-sdk
     - name: Import the Google Cloud Platform public key
-      shell: curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        keyring: /usr/share/keyrings/cloud.google.gpg
       become: true
     - name: Do apt-get update after adding Google Cloud SDK package source
       become: true
