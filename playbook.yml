@@ -65,6 +65,15 @@
           - google-cloud-sdk
           - tmux
           - golang-cfssl
+    - name: Download binary files and place on PATH
+      become: yes
+      get_url: url={{ item.value.url }} dest=/usr/local/bin/{{ item.value.name }} mode=0755 force=yes
+      with_dict: "{{ binaries }}"
+      vars:
+        binaries:
+          kubectl:
+            name: kubectl
+            url: https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kubectl
     - name: gather installed packages to check for Slack, Zoom, Chrome etc
       package_facts:
     - name: Install Slack.
