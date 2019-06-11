@@ -17,11 +17,4 @@ fi
 
 ansible-galaxy install cmprescott.chrome
 ansible-galaxy install geerlingguy.docker
-# ansible-galaxy install gantsign.pin-to-launcher
 
-#####################################
-# Display real installation process #
-echo ""
-echo "Customize the playbook ansible-desktop.yml to suit your needs, then run ansible with :"
-echo "  ansible-playbook ansible-desktop.yml --ask-become-pass"
-echo ""
