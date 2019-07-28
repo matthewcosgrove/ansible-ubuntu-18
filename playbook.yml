@@ -121,6 +121,11 @@
       apt:
         deb: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
       when: '"google-chrome-stable" not in ansible_facts.packages'
+    - name: Install Tusk.
+      become: true
+      apt:
+        deb: https://github.com/klaussinani/tusk/releases/download/v0.23.0/tusk_0.23.0_amd64.deb
+      when: '"tusk" not in ansible_facts.packages'
 
     - name: Set up libsecret for git credential helper
       command: make --directory=/usr/share/doc/git/contrib/credential/libsecret
