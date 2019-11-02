@@ -2,6 +2,17 @@
 
 - name: Ubuntu desktop environment playbook
   hosts: localhost
+  vars_prompt:
+    - name: "run_installs"
+      prompt: "Do you want to run installs (yes/no)?"
+      private: no
+    - name: "use_secret_dotfiles"
+      prompt: "Do you want to use secret dotfiles (yes/no)?"
+      private: no
+    - name: "secret_github_repo_userid"
+      prompt: "Which secret dotfiles GitHub repo userid to use (corresponds to git@github.com:${secret_github_repo_userid}/dotfiles-secret.git)? e.g. matthewcosgrove"
+      private: no
+      default: "matthewcosgrove"
   environment:
     DEBIAN_FRONTEND: noninteractive
   roles:
@@ -24,15 +35,21 @@
           google-cloud-sdk:
             url: '[signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main'
             filename: google-cloud-sdk
+      when:
+        - run_installs | bool
     - name: Import the Google Cloud Platform public key
       apt_key:
         url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
         keyring: /usr/share/keyrings/cloud.google.gpg
       become: true
+      when:
+        - run_installs | bool
     - name: Do apt-get update after adding Google Cloud SDK package source
       become: true
       apt:
         update-cache: yes
+      when:
+        - run_installs | bool
     - name: Install a list of packages
       become: true
       apt:
@@ -104,28 +121,38 @@
           bosh-cli:
             name: bosh
             url: https://github.com/cloudfoundry/bosh-cli/releases/download/v5.5.1/bosh-cli-5.5.1-linux-amd64
+      when:
+        - run_installs | bool
     - name: gather installed packages to check for Slack, Zoom, Chrome etc
       package_facts:
     - name: Install Slack.
       become: true
       apt:
         deb: https://downloads.slack-edge.com/linux_releases/slack-desktop-3.4.2-amd64.deb
-      when: '"slack-desktop" not in ansible_facts.packages'
+      when:
+        - run_installs | bool
+        - '"slack-desktop" not in ansible_facts.packages'
     - name: Install Zoom.
       become: true
       apt:
         deb: https://zoom.us/client/latest/zoom_amd64.deb
-      when: '"zoom" not in ansible_facts.packages'
+      when:
+        - run_installs | bool
+        - '"zoom" not in ansible_facts.packages'
     - name: Install Chrome.
       become: true
       apt:
         deb: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-      when: '"google-chrome-stable" not in ansible_facts.packages'
+      when:
+        - run_installs | bool
+        - '"google-chrome-stable" not in ansible_facts.packages'
     - name: Install Tusk.
       become: true
       apt:
         deb: https://github.com/klaussinani/tusk/releases/download/v0.23.0/tusk_0.23.0_amd64.deb
-      when: '"tusk" not in ansible_facts.packages'
+      when:
+        - run_installs | bool
+        - '"tusk" not in ansible_facts.packages'
 
     - name: Set up libsecret for git credential helper
       command: make --directory=/usr/share/doc/git/contrib/credential/libsecret
@@ -185,20 +212,24 @@
       args:
         executable: /bin/bash
       when: credsforcurlgithub.stat.exists
-    - name: mkdir for gists
+    - name: Make sure required folders are present
       file:
-        path: ~/gists
+        path: "{{ item }}"
         state: directory
-    - name: Clone dotfiles gist
+      with_items:
+        - "~/.dotfiles"
+        - "~/.dotfiles/public"
+        - "~/.dotfiles/private"
+    - name: Clone public dotfiles
       git:
-        repo: git@gist.github.com:f012f714f8a401f965c86f5bc648a300.git
-        dest: ~/gists/dotfiles
+        repo: git@github.com:matthewcosgrove/dotfiles-ubuntu.git
+        dest: ~/.dotfiles/public
         accept_hostkey: yes
         update: no
       become: no
-    - name: symbolic links
+    - name: public symbolic links
       file:
-        src: "~/gists/dotfiles/{{ item.dotfilename }}"
+        src: "~/.dotfiles/public/{{ item.dotfilename }}"
         path: "~/{{ item.dotfilename }}"
         state: link
       with_items:
@@ -213,3 +244,12 @@
         regexp: '^source ~/.bashrc_extension'
         insertafter: EOF
         line: 'source ~/.bashrc_extension'
+    - name: Clone private dotfiles
+      git:
+        repo: git@github.com:{{ secret_github_repo_userid }}/dotfiles-secret.git
+        dest: ~/.dotfiles/private
+        accept_hostkey: yes
+        update: yes
+      when: use_secret_dotfiles | bool
+    - include_tasks: "~/.dotfiles/private/tasks.yml"
+      when: use_secret_dotfiles | bool
