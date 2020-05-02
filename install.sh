@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -eu
 ###################
 # Install ansible #
 if ! grep -q "ansible/ansible" /etc/apt/sources.list /etc/apt/sources.list.d/*; then
