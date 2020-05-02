@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -eu
 : ${GITLAB_ACCESS_TOKEN?: Must set GITLAB_ACCESS_TOKEN to token with api scope for read/write public key}
 : ${GITHUB_ACCESS_TOKEN?: Must set GITHUB_ACCESS_TOKEN to token with write:public_key scope for read/write public key}
 ./install.sh
