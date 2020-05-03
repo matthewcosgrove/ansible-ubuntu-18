@@ -5,5 +5,7 @@ set -eu
 ./install.sh
 ./init-creds-gitlab.sh ${GITLAB_ACCESS_TOKEN}
 ./init-creds-github.sh ${GITHUB_ACCESS_TOKEN}
-ansible-playbook playbook.yml --ask-become-pass
+# TODO: Switch these around when find time to split packages into prereqs for day 1 and day2ops
+ansible-playbook provision-day2ops.yml --ask-become-pass
+ansible-playbook provision-day1ops.yml --ask-become-pass
 ./delete-creds.sh
