@@ -17,6 +17,7 @@
       with_dict: "{{ git_configs }}"
       vars:
         git_configs:
+          # TODO: Fix this for WSL1 with variable https://stackoverflow.com/a/47350274
           credential_helper:
             name: credential.helper
             value: /usr/share/doc/git/contrib/credential/libsecret/git-credential-libsecret
