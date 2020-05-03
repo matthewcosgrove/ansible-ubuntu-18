@@ -1,3 +1,7 @@
+.venv
+*.pyc
+*.pyo
+*.swp
 playbook.retry
 creds-for-curl-gitlab.txt
 creds-for-curl-github.netrc

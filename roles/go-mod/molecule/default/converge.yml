@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include go-mod"
+      include_role:
+        name: "go-mod"
