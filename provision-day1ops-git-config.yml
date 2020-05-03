@@ -1,0 +1,37 @@
+---
+
+- name: Ubuntu day1ops git config
+  hosts: localhost
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+  tasks:
+    - name: Set up libsecret for git credential helper
+      command: make --directory=/usr/share/doc/git/contrib/credential/libsecret
+      become: true
+    - name: Global git config set up
+      git_config:
+        scope: global
+        name: "{{ item.value.name }}"
+        value: "{{ item.value.value }}"
+      with_dict: "{{ git_configs }}"
+      vars:
+        git_configs:
+          credential_helper:
+            name: credential.helper
+            value: /usr/share/doc/git/contrib/credential/libsecret/git-credential-libsecret
+          default_push_behaviour:
+            name: push.default
+            value: simple
+          user_email:
+            name: user.email
+            value: mc.matthew.cosgrove@gmail.com
+          user_name:
+            name: user.name
+            value: matthewcosgrove
+          default_editor:
+            name: core.editor
+            value: vim
+          alias_gs:
+            name: alias.gs
+            value: status

@@ -49,33 +49,6 @@
       when:
         - run_installs | bool
         - '"tusk" not in ansible_facts.packages'
-
-    - name: Set up libsecret for git credential helper
-      command: make --directory=/usr/share/doc/git/contrib/credential/libsecret
-      become: true
-    - name: Global git config set up
-      git_config:
-        scope: global
-        name: "{{ item.value.name }}"
-        value: "{{ item.value.value }}"
-      with_dict: "{{ git_configs }}"
-      vars:
-        git_configs:
-          credential_helper:
-            name: credential.helper
-            value: /usr/share/doc/git/contrib/credential/libsecret/git-credential-libsecret
-          default_push_behaviour:
-            name: push.default
-            value: simple
-          user_email:
-            name: user.email
-            value: mc.matthew.cosgrove@gmail.com
-          user_name:
-            name: user.name
-            value: matthewcosgrove
-          default_editor:
-            name: core.editor
-            value: vim
     - name: Ensure ssh key generated ready to upload to GitHub and GitLab
       command: ssh-keygen -t rsa -f "{{ ssh.key_pair_path }}" -N ''
       args:
