@@ -9,4 +9,5 @@ set -eu
 ansible-playbook provision-day2ops.yml --ask-become-pass
 ansible-playbook provision-day1ops-git-config.yml
 ansible-playbook provision-day1ops.yml --ask-become-pass
+ansible-playbook provision-dotfiles-private.yml --ask-become-pass
 ./delete-creds.sh

@@ -6,13 +6,6 @@
     - name: "run_installs"
       prompt: "Do you want to run installs (yes/no)?"
       private: no
-    - name: "use_secret_dotfiles"
-      prompt: "Do you want to use secret dotfiles (yes/no)?"
-      private: no
-    - name: "secret_github_repo_userid"
-      prompt: "Which secret dotfiles GitHub repo userid to use (corresponds to git@github.com:${secret_github_repo_userid}/dotfiles-secret.git)? e.g. matthewcosgrove"
-      private: no
-      default: "matthewcosgrove"
   environment:
     DEBIAN_FRONTEND: noninteractive
   roles:
@@ -113,12 +106,3 @@
         regexp: '^source ~/.bashrc_extension'
         insertafter: EOF
         line: 'source ~/.bashrc_extension'
-    - name: Clone private dotfiles
-      git:
-        repo: git@github.com:{{ secret_github_repo_userid }}/dotfiles-secret.git
-        dest: ~/.dotfiles/private
-        accept_hostkey: yes
-        update: yes
-      when: use_secret_dotfiles | bool
-    - include_tasks: "~/.dotfiles/private/tasks.yml"
-      when: use_secret_dotfiles | bool
